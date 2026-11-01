@@ -25,7 +25,15 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES} ${CU_SOURCE})
 target_include_directories(${PROJECT_NAME} PRIVATE "./src" ${CUDAToolkit_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE nvinfer)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_ARCHITECTURES "70;80;86;89")
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES "70;80;86;89")
+endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 
-add_subdirectory(test)
-enable_testing()
+target_link_directories(${PROJECT_NAME} PRIVATE ${TensorRT_LIB_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${TensorRT_INCLUDE_DIR})
+
+if(BUILD_TEST)
+    add_subdirectory(test)
+    enable_testing()
+endif()
